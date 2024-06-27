@@ -6,6 +6,8 @@ import { addMetadata } from './complianceData'
 import { appendPresentParams } from './util'
 import { TOKEN_KEY } from './consts'
 
+import { SSE } from 'sse.js'
+
 
 export const API_RESPONSES = {
   RETRY: 'retry',
@@ -112,6 +114,10 @@ export const routes = {
     base: api('dora'),
     doraMetrics: () => `${routes.dora.base}/dora-metrics`,
   },
+  aiAssistant: {
+    base: api('ai-assistant'),
+    chat: () => `${routes.aiAssistant.base}/chat`,
+  }
 }
 
 const features = async () => {
@@ -686,6 +692,63 @@ const dora = {
   },
 }
 
+const aiAssistant = {
+  chat: { 
+    ask : async ({
+      question, 
+      chat,
+      setEvents,
+      setConnectionIsOpen,
+      rootComponentName,
+      rootComponentVersion,
+      currentComponentName,
+      currentComponentVersion,
+    }) => {
+      const url = new URL(routes.aiAssistant.chat())
+      console.log('-------AI Chat Request-------')
+      console.log('payload:')
+      console.log({
+        rootComponentIdentity: `${rootComponentName}:${rootComponentVersion}`,
+        currentComponentIdentity: `${currentComponentName}:${currentComponentVersion}`,
+        question: question,
+        oldMessages: chat,
+      })
+      console.log('----------------------------')
+      const eventSource = new SSE(
+        url, 
+        {
+          headers: {'Content-Type': 'application/json'},
+          payload: JSON.stringify({
+            rootComponentIdentity: `${rootComponentName}:${rootComponentVersion}`,
+            currentComponentIdentity: `${currentComponentName}:${currentComponentVersion}`,
+            question: question,
+            oldMessages: chat,
+          }),
+          debug: true,
+        }
+      )
+
+      eventSource.onmessage = function(event){
+        console.log(event.data)
+        const eventDataObject = JSON.parse(event.data)
+        console.log(eventDataObject)
+        setEvents((prevEvents) => [...prevEvents, eventDataObject])
+        if ('answer' in eventDataObject && eventDataObject.answer != ''){
+          eventSource.close()
+          setConnectionIsOpen(false)
+        }
+      }
+      eventSource.onerror = function(event){
+        console.error('EventSource failed:', event)
+        eventSource.close()
+        setConnectionIsOpen(false)
+      }
+      eventSource.stream()
+      setConnectionIsOpen(true)
+    },
+  },
+}
+
 export {
   auth,
   features,
@@ -698,4 +761,5 @@ export {
   rescore,
   serviceExtensions,
   dora,
+  aiAssistant,
 }

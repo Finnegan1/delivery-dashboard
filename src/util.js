@@ -777,3 +777,26 @@ export const getMonthlyDates = (timeSpanDays) => {
 
   return dates
 }
+
+export const removeBetweenMarkers = (text, startMarker, endMarker) => {
+  let result = ''
+  let insideMarkers = false
+  let i = 0
+
+  while (i < text.length) {
+    if (!insideMarkers && text.slice(i, i + startMarker.length) === startMarker) {
+      insideMarkers = true
+      i += startMarker.length
+    } else if (insideMarkers && text.slice(i, i + endMarker.length) === endMarker) {
+      insideMarkers = false
+      i += endMarker.length
+    } else if (!insideMarkers) {
+      result += text[i]
+      i++
+    } else {
+      i++
+    }
+  }
+
+  return result
+}
