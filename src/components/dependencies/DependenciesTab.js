@@ -9,6 +9,7 @@ import {
   Button,
   capitalize,
   CircularProgress,
+  Fab,
   Grid,
   IconButton,
   InputAdornment,
@@ -19,6 +20,7 @@ import {
   Typography,
   useTheme,
 } from '@mui/material'
+import AssistantIcon from '@mui/icons-material/Assistant'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
@@ -27,6 +29,7 @@ import SearchIcon from '@mui/icons-material/Search'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import { useSnackbar } from 'notistack'
 
+import ChatDialog from '../aiAssistent/ChatDialog'
 import { FeatureRegistrationContext, SearchParamContext } from '../../App'
 import { Component, Components } from './Component'
 import {
@@ -420,6 +423,11 @@ export const BomTab = React.memo(({
   const featureRegistrationContext = React.useContext(FeatureRegistrationContext)
   const [specialComponentsFeature, setSpecialComponentsFeature] = React.useState()
 
+  const [isAiAssistantOpen, openAiAssistant] = React.useState(false)
+  const toggleAiAssistant = () => {
+    openAiAssistant(!isAiAssistantOpen)
+  }
+
   React.useEffect(() => {
     return registerCallbackHandler({
       featureRegistrationContext: featureRegistrationContext,
@@ -458,6 +466,23 @@ export const BomTab = React.memo(({
         searchQuery={searchQuery}
         setComponentRefs={setComponentRefs}
       />
+    }
+    {
+      isLoading ? null : <>
+        <Fab
+          onClick={toggleAiAssistant}
+          color='secondary' 
+          aria-label='edit'
+          sx={{
+            position: 'fixed',
+            bottom: (theme) => theme.spacing(2),
+            right: (theme) => theme.spacing(2)
+          }}
+        >
+          <AssistantIcon />
+        </Fab>
+        <ChatDialog open={isAiAssistantOpen} changeOpenState={openAiAssistant} component={component}/>
+      </>
     }
   </Box>
 })

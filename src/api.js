@@ -712,6 +712,7 @@ const aiAssistant = {
         currentComponentIdentity: `${currentComponentName}:${currentComponentVersion}`,
         question: question,
         oldMessages: chat,
+        threadId: '9999',
       })
       console.log('----------------------------')
       const eventSource = new SSE(
@@ -723,6 +724,7 @@ const aiAssistant = {
             currentComponentIdentity: `${currentComponentName}:${currentComponentVersion}`,
             question: question,
             oldMessages: chat,
+            threadId: '9999',
           }),
           debug: true,
         }

@@ -22,7 +22,6 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import RefreshIcon from '@mui/icons-material/Refresh'
-import AssistantIcon from '@mui/icons-material/Assistant'
 
 import { useNavigate } from 'react-router-dom'
 
@@ -45,7 +44,6 @@ import { useFetchComponentDescriptor } from '../api/useFetch'
 import { registerCallbackHandler } from '../feature'
 import NotFoundPage from '../pages/NotFoundPage'
 import { ComponentTabs } from './Tabs'
-import ChatDialog from './aiAssistent/ChatDialog'
 
 
 const ComponentDescriptorError = ({
@@ -77,10 +75,6 @@ export const ComponentView = ({
     versionFilter: componentMeta.versionFilter,
   })
 
-  const [isAiAssistantOpen, openAiAssistant] = useState(false)
-  const toggleAiAssistant = () => {
-    openAiAssistant(!isAiAssistantOpen)
-  }
   return <Box>
     <NavigationHeader
       component={componentDescriptor ? componentDescriptor.component : componentMeta}
@@ -97,21 +91,6 @@ export const ComponentView = ({
           isLoading={isLoading}
           ocmRepo={ocmRepo}
         />
-        <Fab
-          onClick={toggleAiAssistant}
-          color='secondary' 
-          aria-label='edit'
-          sx={{
-            position: 'fixed',
-            bottom: (theme) => theme.spacing(2),
-            right: (theme) => theme.spacing(2)
-          }}
-        >
-          <AssistantIcon />
-        </Fab>
-        {
-          isLoading ? null : <ChatDialog open={isAiAssistantOpen} changeOpenState={openAiAssistant} component={componentDescriptor.component}/>
-        }
       </>
     }
   </Box>

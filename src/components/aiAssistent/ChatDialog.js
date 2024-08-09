@@ -21,7 +21,9 @@ import {
 } from '../../consts'
 
 import { aiAssistant } from '../../api'
-import CenteredSpinner from '../util/CenteredSpinner'
+import Lottie from "lottie-react";
+import loadingPlant from "./loading_plant.json";
+import gardeberAnimation from './gardener_animation.json'
 
 /**
  * 
@@ -61,7 +63,8 @@ const ChatDialog = ({open, changeOpenState, component}) => {
   }
 
   const componentNamesCompletionData = [
-    {id: 'github.com/gardener/gardener', display: 'gardener'},
+    {id: 'github.com/gardener/gardener version "v1.97.2"', display: 'gardener:v1.97.2'},
+    {id: 'github.com/gardener/gardener version "v1.95.1"', display: 'gardener:v1.95.1'},
     {id: 'github.com/gardener/dashboard', display: 'dashboard'},
     {id: 'github.com/gardenlinux/gardenlinux', display: 'gardenlinux'},
     {id: 'github.wdf.sap.corp/kubernetes/landscape-setup', display: 'landscape-setup'},
@@ -71,10 +74,10 @@ const ChatDialog = ({open, changeOpenState, component}) => {
 
   useEffect(()=>{
     const lastEvent = events[events.length - 1]
-    if(lastEvent && 'answer' in lastEvent && lastEvent.answer != ''){
+    if(lastEvent && lastEvent['end']){
       setChatMessages([
         ...chatMessages,
-        {'type': 'human', 'content': messageInput},
+        {'type': 'human', 'content': removeBetweenMarkers(messageInput, '!#RS#!', '!#RE#!')},
         {'type': 'ai', 'content': lastEvent['answer']}
       ])
     }
@@ -144,8 +147,28 @@ const ChatDialog = ({open, changeOpenState, component}) => {
           })
         }
         {
-          connectionIsOpen 
-            ? <CenteredSpinner/>
+          connectionIsOpen && events.length > 0  
+            ? <>
+              <Box 
+                display='flex'
+                flexDirection='column'
+                justifyContent='center'
+                alignItems='center'
+                width='100%'
+              >
+                <Lottie 
+                  animationData={
+                    events[events.length - 1]['nextStep'] == 'Creating a step by step Plan.' ? loadingPlant : gardeberAnimation
+                  }
+                  loop={true} 
+                  style={{height: '5rem'}} 
+                />
+                {
+                  //events[events.length - 1]['nextStep']
+                }
+              </Box>
+              <br/>
+            </>
             : <></>
         }
       </Box>
